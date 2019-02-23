@@ -9,7 +9,7 @@ Dynamic Variables  Variables that can be changed.
 Decision Variables Variables whose values we would like to minimize.
 
 """
-#
+# fdsafdsa
 data = pd.read_csv('./traffic.csv')
 columns = data.columns
 
