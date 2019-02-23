@@ -17,9 +17,9 @@ class DNNModel:
         from torch.utils.data.dataset import random_split
         # Create random Tensors to hold inputs and outputs
         print('Loading Pre Train Set')
-        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=None)
+        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=10000)
         print('Loading Test Set')
-        self.test_dataset = SubstanceAbuseDataset('HackTest.csv', './', Compose([ToXY(), ToTensor()]), n_rows=None,
+        self.test_dataset = SubstanceAbuseDataset('HackTest.csv', './', Compose([ToXY(), ToTensor()]), n_rows=10000,
                                              master_columns=train_val_dataset_pre.traffic_frame.columns)
         print('Loading Train')
         self.train_val_dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]),
