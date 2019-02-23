@@ -19,10 +19,10 @@ class DNNModel:
         print(f'Using torch version {torch.__version__}')
 
         # Create random Tensors to hold inputs and outputs
-        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=200)
-        test_dataset = SubstanceAbuseDataset('HackTest.csv', './', Compose([ToXY(), ToTensor()]), n_rows=200,
+        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=5000)
+        test_dataset = SubstanceAbuseDataset('HackTest.csv', './', Compose([ToXY(), ToTensor()]), n_rows=None,
                                              master_columns=train_val_dataset_pre.traffic_frame.columns)
-        train_val_dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=200,
+        train_val_dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=5000,
                                                   master_columns=test_dataset.traffic_frame.columns)
         validation_set_size = .2
         train_dataset, validation_dataset = random_split(train_val_dataset,
@@ -62,7 +62,7 @@ class DNNModel:
         loss_fn = torch.nn.MSELoss(size_average=False)
 
         learning_rate = 1e-3
-        for t in range(5):
+        for t in range(50):
             cum_loss = []
             for i_batch, sample_batched in enumerate(train_loader):
                 x_batch = sample_batched['X'].to(device=device)
@@ -137,4 +137,4 @@ class DNNModel:
 
 
         pd.DataFrame({'CASEID':indexes, 'LOS_PRED':y_los, 'REASON_PRED': y_reason})\
-            .to_csv('../submission/predictions.csv', header=False)
+            .to_csv('../submission/predictions.csv', header=False, index=False)
