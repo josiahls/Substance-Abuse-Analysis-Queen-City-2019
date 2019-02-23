@@ -17,14 +17,14 @@ import numpy as np
 print(f'Using torch version {torch.__version__}')
 
 # Create random Tensors to hold inputs and outputs
-dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=None)
+dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=100)
 test_set_size = .2
-train_dataset, test_dataset = random_split(dataset, lengths=[int(len(dataset) * test_set_size),
-                                                             int(len(dataset) - int(len(dataset)
+train_dataset, validation_dataset = random_split(dataset, lengths=[int(len(dataset) * test_set_size),
+                                                                   int(len(dataset) - int(len(dataset)
                                                                                     * test_set_size))])
 
 train_loader = DataLoader(train_dataset, batch_size=10, shuffle=True, num_workers=4)
-test_loader = DataLoader(test_dataset, batch_size=10, shuffle=True, num_workers=4)
+validation_loader = DataLoader(validation_dataset, batch_size=10, shuffle=True, num_workers=4)
 
 # Use the nn package to define our model as a sequence of layers. nn.Sequential
 # is a Module which contains other Modules, and applies them in sequence to
@@ -89,7 +89,7 @@ for t in range(500):
                 param -= learning_rate * param.grad
 
     cum_test_loss = []
-    for i_batch, sample_batched in enumerate(test_loader):
+    for i_batch, sample_batched in enumerate(validation_loader):
         # Forward pass: compute predicted y by passing x to the model. Module objects
         # override the __call__ operator so you can call them like functions. When
         # doing so you pass a Tensor of input data to the Module and it produces
