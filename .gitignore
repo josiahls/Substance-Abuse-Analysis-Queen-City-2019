@@ -71,3 +71,8 @@ gen
 /src/data/Test.zip
 /src/data/Prescriber.csv.zip
 /src/data/Train.zip
+.DS_Store
+src/data/HackTest.csv
+src/data/HackTrain.csv
+/src/data/HackTest.csv
+/src/data/HackTrain.csv
