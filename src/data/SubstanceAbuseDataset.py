@@ -34,19 +34,19 @@ class SubstanceAbuseDataset(Dataset):
         """
 
         if dataframe is None:
-            self.traffic_frame = pd.read_csv(os.path.join(str(Path(__file__).resolve().parents[1]), 'data', csv_file),
-                                             nrows=n_rows)
+            self.substance_abuse_frame = pd.read_csv(os.path.join(str(Path(__file__).resolve().parents[1]), 'data', csv_file),
+                                                     nrows=n_rows)
             # TODO Parker Randomize here ^^^^
         else:
-            self.traffic_frame = dataframe
-        self.raw_frame = pd.DataFrame.copy(self.traffic_frame)
+            self.substance_abuse_frame = dataframe
+        self.raw_frame = pd.DataFrame.copy(self.substance_abuse_frame)
 
         # Columns to keep
         keep_columns = JosiahAnalysis.CATEGORICAL_VARIABLES + JosiahAnalysis.CONTINUOUS_VARIABLES + \
                        JosiahAnalysis.DECISION_VARIABLES + JosiahAnalysis.INDEX_VARIABLES
-        keep_columns = [c for c in keep_columns if c in self.traffic_frame.columns]
+        keep_columns = [c for c in keep_columns if c in self.substance_abuse_frame.columns]
         # self.index_frame = self.traffic_frame[keep_columns + JosiahAnalysis.INDEX_VARIABLES]
-        self.traffic_frame = self.traffic_frame[keep_columns]
+        self.substance_abuse_frame = self.substance_abuse_frame[keep_columns]
 
         # # Remove rows that have nans in specific columns
         # if all(c in self.traffic_frame.columns for c in JosiahAnalysis.HARD_NOT_NAN_VARIABLES):
@@ -60,11 +60,11 @@ class SubstanceAbuseDataset(Dataset):
 
         # One Hot Categorical Columns
         accum_categoricals = []
-        for column in [_ for _ in JosiahAnalysis.CATEGORICAL_VARIABLES if _ in self.traffic_frame]:
-            one_hot_slice = pd.get_dummies(self.traffic_frame[column])
+        for column in [_ for _ in JosiahAnalysis.CATEGORICAL_VARIABLES if _ in self.substance_abuse_frame]:
+            one_hot_slice = pd.get_dummies(self.substance_abuse_frame[column])
             one_hot_slice.columns = [column + '_' + str(c) for c in one_hot_slice.columns]
-            self.traffic_frame = self.traffic_frame.join(one_hot_slice, how='left')
-            self.traffic_frame.drop(labels=column, axis=1, inplace=True)
+            self.substance_abuse_frame = self.substance_abuse_frame.join(one_hot_slice, how='left')
+            self.substance_abuse_frame.drop(labels=column, axis=1, inplace=True)
             # Update the decision, dynamic, and fixed variables to take all this into account
             if column not in JosiahAnalysis.DECISION_VARIABLES:
                 JosiahAnalysis.DECISION_VARIABLES += list(one_hot_slice.columns)
@@ -74,33 +74,33 @@ class SubstanceAbuseDataset(Dataset):
                 JosiahAnalysis.CONTINUOUS_VARIABLES += list(one_hot_slice.columns)
 
         # If there are still rows that are nan, drop them
-        self.traffic_frame.dropna(inplace=True)
+        self.substance_abuse_frame.dropna(inplace=True)
 
         # Same the max value for all the columns for easy re-translation
-        self.max_value_key = self.traffic_frame.max(axis=0)
+        self.max_value_key = self.substance_abuse_frame.max(axis=0)
 
-        normalize_columns = [c for c in self.traffic_frame.columns if c not in JosiahAnalysis.INDEX_VARIABLES]
+        normalize_columns = [c for c in self.substance_abuse_frame.columns if c not in JosiahAnalysis.INDEX_VARIABLES]
         # Lastly, verify each row, and normalize it if needed
-        self.traffic_frame[normalize_columns] = self.traffic_frame[normalize_columns] \
-            .div(self.traffic_frame[normalize_columns].max(axis=0), axis=1)
+        self.substance_abuse_frame[normalize_columns] = self.substance_abuse_frame[normalize_columns] \
+            .div(self.substance_abuse_frame[normalize_columns].max(axis=0), axis=1)
 
         if master_columns is not None:
             # Add missing columns as zeros
-            for c in [c for c in master_columns if c not in self.traffic_frame.columns]:
-                self.traffic_frame.assign(Name=c)
-                self.traffic_frame[c] = 0
+            for c in [c for c in master_columns if c not in self.substance_abuse_frame.columns]:
+                self.substance_abuse_frame.assign(Name=c)
+                self.substance_abuse_frame[c] = 0
 
         # Sort the columns so that their values match other frame loads
-        self.traffic_frame = self.traffic_frame.reindex(sorted(self.traffic_frame.columns), axis=1)
+        self.substance_abuse_frame = self.substance_abuse_frame.reindex(sorted(self.substance_abuse_frame.columns), axis=1)
 
         self.root_dir = root_dir
         self.transform = transform
 
     def __len__(self):
-        return len(self.traffic_frame)
+        return len(self.substance_abuse_frame)
 
     def __getitem__(self, idx: int):
-        sample = self.traffic_frame.iloc[int(idx)].to_dict()
+        sample = self.substance_abuse_frame.iloc[int(idx)].to_dict()
 
         if self.transform:
             sample = self.transform(sample)

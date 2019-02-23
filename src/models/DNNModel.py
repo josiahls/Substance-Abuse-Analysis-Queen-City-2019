@@ -20,13 +20,13 @@ class DNNModel:
         from torch.utils.data.dataset import random_split
         # Create random Tensors to hold inputs and outputs
         print('Loading Pre Train Set')
-        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=100)
+        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=50000)
         print('Loading Test Set')
-        self.test_dataset = SubstanceAbuseDataset('HackTest.csv', './', Compose([ToXY(), ToTensor()]), n_rows=100,
-                                             master_columns=train_val_dataset_pre.traffic_frame.columns)
+        self.test_dataset = SubstanceAbuseDataset('HackTest.csv', './', Compose([ToXY(), ToTensor()]), n_rows=None,
+                                                  master_columns=train_val_dataset_pre.substance_abuse_frame.columns)
         print('Loading Train')
         self.train_val_dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]),
-                                                       master_columns=self.test_dataset.traffic_frame.columns,
+                                                       master_columns=self.test_dataset.substance_abuse_frame.columns,
                                                        dataframe=train_val_dataset_pre.raw_frame)
 
         validation_set_size = .3
@@ -60,11 +60,11 @@ class DNNModel:
         self.model = torch.nn.Sequential(
             torch.nn.Linear(len(self.train_dataset[0]['X']), 100),
             torch.nn.LeakyReLU(),
-            torch.nn.Linear(100, 20),
+            torch.nn.Linear(100, 50),
             torch.nn.LeakyReLU(),
-            torch.nn.Linear(20, 5),
+            torch.nn.Linear(50, 25),
             torch.nn.LeakyReLU(),
-            torch.nn.Linear(5, len(self.train_dataset[0]['Y'])),
+            torch.nn.Linear(25, len(self.train_dataset[0]['Y'])),
         )
 
         # self.model = torch.nn.Sequential( torch.nn.Linear(10, 20), torch.nn.Linear(20, 2))
@@ -84,7 +84,7 @@ class DNNModel:
 
         loss_tracking = []
         learning_rate = 1e-3
-        for t in range(30):
+        for t in range(100):
             cum_loss = []
             for i_batch, sample_batched in enumerate(self.train_loader):
                 x_batch = sample_batched['X'].to(device=self.device)
