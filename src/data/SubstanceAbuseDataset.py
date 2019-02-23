@@ -32,6 +32,7 @@ class SubstanceAbuseDataset(Dataset):
         if dataframe is None:
             self.traffic_frame = pd.read_csv(os.path.join(str(Path(__file__).resolve().parents[1]), 'data', csv_file),
                                              nrows=n_rows)
+            # TODO Parker Randomize here ^^^^
         else:
             self.traffic_frame = dataframe
         self.raw_frame = pd.DataFrame.copy(self.traffic_frame)
