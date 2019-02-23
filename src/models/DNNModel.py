@@ -19,9 +19,9 @@ class DNNModel:
         from torch.utils.data.dataset import random_split
         # Create random Tensors to hold inputs and outputs
         print('Loading Pre Train Set')
-        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=100)
+        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=15000)
         print('Loading Test Set')
-        self.test_dataset = SubstanceAbuseDataset('HackTest.csv', './', Compose([ToXY(), ToTensor()]), n_rows=100,
+        self.test_dataset = SubstanceAbuseDataset('HackTest.csv', './', Compose([ToXY(), ToTensor()]), n_rows=None,
                                              master_columns=train_val_dataset_pre.traffic_frame.columns)
         print('Loading Train')
         self.train_val_dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]),
@@ -55,9 +55,11 @@ class DNNModel:
         # is a Module which contains other Modules, and applies them in sequence to
         # produce its output. Each Linear Module computes output from input using a
         # linear function, and holds internal Tensors for its weight and bias.
-        H = 200
+        H = 100
         self.model = torch.nn.Sequential(
             torch.nn.Linear(len(self.train_dataset[0]['X']), H),
+            torch.nn.LeakyReLU(),
+            torch.nn.Linear(H, H),
             torch.nn.LeakyReLU(),
             torch.nn.Linear(H, H),
             torch.nn.LeakyReLU(),
@@ -81,7 +83,7 @@ class DNNModel:
 
         loss_tracking = []
         learning_rate = 1e-3
-        for t in range(5):
+        for t in range(400):
             cum_loss = []
             for i_batch, sample_batched in enumerate(self.train_loader):
                 x_batch = sample_batched['X'].to(device=self.device)
@@ -168,6 +170,8 @@ class DNNModel:
             indexes.append(int(x_indexed.detach().numpy()[0]))
             y_reason.append(int(round(decoded_y_pred[0])))
             y_los.append(int(round(decoded_y_pred[1])))
+            if i % 100:
+                print(f'At test i {i}')
 
         pd.DataFrame({'CASEID': indexes, 'LOS_PRED': y_los, 'REASON_PRED': y_reason}) \
             .to_csv('../submission/predictions.csv', header=False, index=False)
