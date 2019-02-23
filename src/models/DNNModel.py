@@ -9,18 +9,26 @@ class DNNModel:
         from torchvision.transforms import Compose
         from src.data.SubstanceAbuseDataset import SubstanceAbuseDataset
         from src.data.Transforms import ToXY, ToTensor
+        from src.data.Analysis import JosiahAnalysis
         import torch
+        import pandas as pd
         import numpy as np
+
         # N is batch size; D_in is input dimension;
         # H is hidden dimension; D_out is output dimension.
         print(f'Using torch version {torch.__version__}')
 
         # Create random Tensors to hold inputs and outputs
-        dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=None)
-        test_set_size = .2
-        train_dataset, validation_dataset = random_split(dataset, lengths=[int(len(dataset) * test_set_size),
-                                                                           int(len(dataset) - int(len(dataset)
-                                                                                            * test_set_size))])
+        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=200)
+        test_dataset = SubstanceAbuseDataset('HackTest.csv', './', Compose([ToXY(), ToTensor()]), n_rows=200,
+                                             master_columns=train_val_dataset_pre.traffic_frame.columns)
+        train_val_dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=200,
+                                                  master_columns=test_dataset.traffic_frame.columns)
+        validation_set_size = .2
+        train_dataset, validation_dataset = random_split(train_val_dataset,
+                                                         lengths=[int(len(train_val_dataset) * validation_set_size),
+                                                                  int(len(train_val_dataset) - int(len(train_val_dataset)
+                                                                                              * validation_set_size))])
 
         train_loader = DataLoader(train_dataset, batch_size=10, shuffle=True, num_workers=4)
         validation_loader = DataLoader(validation_dataset, batch_size=10, shuffle=True, num_workers=4)
@@ -41,6 +49,7 @@ class DNNModel:
         # model = torch.nn.Sequential( torch.nn.Linear(10, 20), torch.nn.Linear(20, 2))
         # Try loading cuda
         use_cuda = torch.cuda.is_available()
+        print(f'Using Cude? {use_cuda}')
         device = torch.device("cuda:0" if use_cuda else "cpu")
 
         model.to(device=device)
@@ -53,7 +62,7 @@ class DNNModel:
         loss_fn = torch.nn.MSELoss(size_average=False)
 
         learning_rate = 1e-3
-        for t in range(500):
+        for t in range(5):
             cum_loss = []
             for i_batch, sample_batched in enumerate(train_loader):
                 x_batch = sample_batched['X'].to(device=device)
@@ -105,8 +114,27 @@ class DNNModel:
             writer.add_scalar('data/train', torch.mean(torch.from_numpy(np.array(cum_loss, dtype=np.float64))), t)
             writer.add_scalar('data/test', torch.mean(torch.from_numpy(np.array(cum_test_loss, dtype=np.float64))), t)
 
-            # plotter.live_plotter(torch.mean(torch.from_numpy(np.array(cum_test_loss, dtype=np.float64))))
-
         # export scalar data to JSON for external processing
         writer.export_scalars_to_json("./all_scalars.json")
         writer.close()
+
+        # Variables to accumulate the outputs for the prediction csv
+        indexes = []
+        y_los = []
+        y_reason = []
+
+        # Run on test set:
+        maxes = train_val_dataset.max_value_key[JosiahAnalysis.DECISION_VARIABLES]
+        for i in range(len(test_dataset)):
+            x = test_dataset[i]['X'].to(device=device)
+            x_indexed = test_dataset[i]['I'].to(device=device)
+            # Add missing columns as zeros
+            y_pred = model(x)
+            decoded_y_pred = np.multiply(y_pred.detach().numpy(), np.array(maxes))
+            indexes.append(int(x_indexed.detach().numpy()[0]))
+            y_reason.append(int(round(decoded_y_pred[0])))
+            y_los.append(int(round(decoded_y_pred[1])))
+
+
+        pd.DataFrame({'CASEID':indexes, 'LOS_PRED':y_los, 'REASON_PRED': y_reason})\
+            .to_csv('../submission/predictions.csv', header=False)

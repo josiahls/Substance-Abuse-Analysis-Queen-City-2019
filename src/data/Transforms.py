@@ -17,5 +17,7 @@ class ToXY(object):
     """Convert ndarrays in sample to Tensors."""
 
     def __call__(self, sample: dict):
-        return {'X': [sample[c] for c in sample if c not in JosiahAnalysis.DECISION_VARIABLES if c in sample],
-                'Y': [sample[c] for c in JosiahAnalysis.DECISION_VARIABLES if c in sample]}
+        return {'X': [sample[c] for c in sample if c not in JosiahAnalysis.DECISION_VARIABLES if c in sample
+                      if c not in JosiahAnalysis.INDEX_VARIABLES],
+                'Y': [sample[c] for c in JosiahAnalysis.DECISION_VARIABLES if c in sample],
+                'I': [sample[c] for c in JosiahAnalysis.INDEX_VARIABLES if c in sample]}
