@@ -10,7 +10,6 @@ class DNNModel:
         self.train_val_dataset = None
 
     def load_data(self):
-        from torch.utils.data import DataLoader
         from torchvision.transforms import Compose
         from src.data.SubstanceAbuseDataset import SubstanceAbuseDataset
         from src.data.Transforms import ToXY, ToTensor
@@ -34,15 +33,16 @@ class DNNModel:
                                                                                 len(self.train_val_dataset)
                                                                                 * validation_set_size))])
 
-        self.train_loader = DataLoader(self.train_dataset, batch_size=10, shuffle=True, num_workers=4)
-        self.validation_loader = DataLoader(self.validation_dataset, batch_size=10, shuffle=True, num_workers=4)
-
     def train(self):
         import sys
         sys.path.append('../')
         from tensorboardX import SummaryWriter
         import torch
         import numpy as np
+        from torch.utils.data import DataLoader
+
+        self.train_loader = DataLoader(self.train_dataset, batch_size=10, shuffle=True, num_workers=4)
+        self.validation_loader = DataLoader(self.validation_dataset, batch_size=10, shuffle=True, num_workers=4)
 
         # N is batch size; D_in is input dimension;
         # H is hidden dimension; D_out is output dimension.
@@ -77,7 +77,7 @@ class DNNModel:
         loss_fn = torch.nn.MSELoss(size_average=False)
 
         learning_rate = 1e-3
-        for t in range(100):
+        for t in range(20):
             cum_loss = []
             for i_batch, sample_batched in enumerate(self.train_loader):
                 x_batch = sample_batched['X'].to(device=self.device)
