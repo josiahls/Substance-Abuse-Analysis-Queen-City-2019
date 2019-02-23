@@ -69,14 +69,6 @@ class SubstanceAbuseDataset(Dataset):
 
 
 if __name__ == '__main__':
-    # traffic_dataset = TrafficDataset('./traffic.csv', './', None, n_rows=100)
-    #
-    # for i in range(len(traffic_dataset)):
-    #     sample = traffic_dataset[i]
-    #
-    #     if i > 5:
-    #         break
-
     traffic_dataset = SubstanceAbuseDataset('./HackTrain.csv', './', Compose([]), n_rows=100)
 
     for i in range(len(traffic_dataset)):
