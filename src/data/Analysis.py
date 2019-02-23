@@ -14,12 +14,15 @@ class ParkerAnalysis:
     IGNORED_VARIABLES = ['YEAR', 'CASEID']
     FIXED_VARIABLES = []
     DYNAMIC_VARIABLES = []
-    DECISION_VARIABLES = []
-    """ Cleaning VARIABLES """
-    CATEGORICAL_VARIABLES = []
-    BOOLEAN_VARIABLES = []
+    DECISION_VARIABLES = ['REASON', 'LOS']
     HARD_NOT_NAN_VARIABLES = [] + DECISION_VARIABLES
-    MILT_TIME_VARIABLES = []
+
+    """ Cleaning VARIABLES """
+    CATEGORICAL_VARIABLES = ['DSMCRIT']
+    CONTINUOUS_AND_1HOT_VARIABLES = {'AGE': ['12']} # the value of 12 in age needs an additional 1hot column
+    CONTINUOUS_VARIABLES = []
+    BOOLEAN_VARIABLES = ['SEX']
+    #CUSTOM_VARIABLES = ['DSMCRIT'] # these will be passed to a function with the name of the variable for cleaning
 
 class JosiahAnalysis:
     IGNORED_VARIABLES = ['YEAR', 'CASEID', 'CBSA']
@@ -30,6 +33,7 @@ class JosiahAnalysis:
     CATEGORICAL_VARIABLES = ['SERVSETA', 'DISYR', 'AGE', 'GENDER', 'RACE', 'ETHNIC', 'MARSTAT', 'EDUC', 'EMPLOY', 'DETNLF', 'PREG', 'VET', 'LIVARAG', 'PRIMINC', 'ARRESTS', 'STFIPS', 'REGION', 'DIVISION', 'SERVSETD', 'METHUSE', 'DAYWAIT', 'PSOURCE', 'DETCRIM', 'NOPRIOR', 'SUB1', 'ROUTE1', 'FREQ1', 'FRSTUSE1', 'SUB2', 'ROUTE2', 'FREQ2', 'FRSTUSE2', 'SUB3', 'ROUTE3', 'FREQ3', 'FRSTUSE3', 'NUMSUBS', 'IDU', 'ALCFLG', 'COKEFLG', 'MARFLG', 'HERFLG', 'METHFLG', 'OPSYNFLG', 'PCPFLG', 'HALLFLG', 'MTHAMFLG', 'AMPHFLG', 'STIMFLG', 'BENZFLG', 'TRNQFLG', 'BARBFLG', 'SEDHPFLG', 'INHFLG', 'OTCFLG', 'OTHERFLG', 'ALCDRUG', 'DSMCRIT', 'PSYPROB', 'HLTHINS', 'PRIMPAY']
     BOOLEAN_VARIABLES = []
     HARD_NOT_NAN_VARIABLES = [] + DECISION_VARIABLES
+    MILT_TIME_VARIABLES = []
 
 if __name__ == '__main__':
     data = pd.read_csv('./HackTrain.csv', nrows=200)
