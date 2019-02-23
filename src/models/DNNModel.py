@@ -19,19 +19,19 @@ class DNNModel:
         print(f'Using torch version {torch.__version__}')
 
         # Create random Tensors to hold inputs and outputs
-        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=5000)
+        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=None)
         test_dataset = SubstanceAbuseDataset('HackTest.csv', './', Compose([ToXY(), ToTensor()]), n_rows=None,
                                              master_columns=train_val_dataset_pre.traffic_frame.columns)
-        train_val_dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=5000,
+        train_val_dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=None,
                                                   master_columns=test_dataset.traffic_frame.columns)
-        validation_set_size = .2
+        validation_set_size = .3
         train_dataset, validation_dataset = random_split(train_val_dataset,
                                                          lengths=[int(len(train_val_dataset) * validation_set_size),
                                                                   int(len(train_val_dataset) - int(len(train_val_dataset)
                                                                                               * validation_set_size))])
 
-        train_loader = DataLoader(train_dataset, batch_size=10, shuffle=True, num_workers=4)
-        validation_loader = DataLoader(validation_dataset, batch_size=10, shuffle=True, num_workers=4)
+        train_loader = DataLoader(train_dataset, batch_size=20, shuffle=True, num_workers=4)
+        validation_loader = DataLoader(validation_dataset, batch_size=20, shuffle=True, num_workers=4)
 
         # Use the nn package to define our model as a sequence of layers. nn.Sequential
         # is a Module which contains other Modules, and applies them in sequence to
@@ -49,7 +49,7 @@ class DNNModel:
         # model = torch.nn.Sequential( torch.nn.Linear(10, 20), torch.nn.Linear(20, 2))
         # Try loading cuda
         use_cuda = torch.cuda.is_available()
-        print(f'Using Cude? {use_cuda}')
+        print(f'Using Cuda? {use_cuda}')
         device = torch.device("cuda:0" if use_cuda else "cpu")
 
         model.to(device=device)
