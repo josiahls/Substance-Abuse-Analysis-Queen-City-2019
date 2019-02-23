@@ -16,7 +16,7 @@ cd $PBS_O_WORKDIR
 mkdir log
 {
 module load pytorch/0.4.0-anaconda3-cuda8
-python ./DNNModel.py
+python ./Driver.py
 } > log/output_"$PBS_JOBNAME"_$PBS_JOBID 2>log/errorLog_"$PBS_JOBNAME"_$PBS_JOBID
 
 ## Running: Server
