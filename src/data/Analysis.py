@@ -11,6 +11,7 @@ Decision Variables Variables whose values we would like to minimize.
 """
 
 class ParkerAnalysis:
+    IGNORED_VARIABLES = ['YEAR', 'CASEID', 'CBSA', 'STFIPS']
 
     """ Cleaning VARIABLES """
     CATEGORICAL_VARIABLES = ['DSMCRIT', 'RACE', 'MARSTAT', 'LIVARAG', 'PRIMINC', 'REGION', 'DIVISION', 'SERVSETD', 'REASON', 'DETCRIM', 'SUB1', 'ROUTE1', 'SUB2', 'ROUTE2', 'SUB3', 'ROUTE3', 'IDU', 'ALCDRUG', 'DSMCRIT', 'HLTHINS', 'PRIMPAY']
@@ -22,7 +23,7 @@ class ParkerAnalysis:
     # geo variable: STFIPS, CBSA
     # look at EMPLOY/DETNLF
 
-    # STFIPS, CBSA
+    # ignored STFIPS, CBSA
     # further break down: SERVSETD
     # LOS needs to be changed to the correct day range
     # more frequency: FREQ1 and FREQ2
