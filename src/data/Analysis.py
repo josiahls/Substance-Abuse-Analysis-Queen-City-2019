@@ -10,14 +10,14 @@ Decision Variables Variables whose values we would like to minimize.
 
 """
 # fdsafdsa
-data = pd.read_csv('./traffic.csv')
+data = pd.read_csv('./HackTrain.csv', nrows=200)
 columns = data.columns
 
 columns_and_values = np.hstack((np.array(columns).reshape((-1, 1)), np.array([data[c].unique()[:] for c in columns]).reshape(-1, 1)))
 
 print(columns_and_values)
 
-IGNORED_VARIABLES = []
+IGNORED_VARIABLES = ['YEAR']
 FIXED_VARIABLES = []
 DYNAMIC_VARIABLES = []
 DECISION_VARIABLES = []
