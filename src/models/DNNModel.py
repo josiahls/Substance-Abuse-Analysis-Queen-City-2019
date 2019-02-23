@@ -1,4 +1,7 @@
 import sys
+
+from torch.utils.data.dataset import random_split
+
 sys.path.append('../')
 
 from tensorboardX import SummaryWriter
@@ -13,10 +16,12 @@ import numpy as np
 # H is hidden dimension; D_out is output dimension.
 print(f'Using torch version {torch.__version__}')
 
-
 # Create random Tensors to hold inputs and outputs
-train_dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=100)
-test_dataset = SubstanceAbuseDataset('HackTest.csv', './', Compose([ToXY(), ToTensor()]), n_rows=100)
+dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=None)
+test_set_size = .2
+train_dataset, test_dataset = random_split(dataset, lengths=[int(len(dataset) * test_set_size),
+                                                             int(len(dataset) - int(len(dataset)
+                                                                                    * test_set_size))])
 
 train_loader = DataLoader(train_dataset, batch_size=10, shuffle=True, num_workers=4)
 test_loader = DataLoader(test_dataset, batch_size=10, shuffle=True, num_workers=4)
@@ -63,7 +68,7 @@ for t in range(500):
         # Compute and print loss. We pass Tensors containing the predicted and true
         # values of y, and the loss function returns a Tensor containing the
         # loss.
-        loss = loss_fn(y_pred, y_batch)
+        loss = torch.sqrt(loss_fn(y_pred, y_batch))
 
         cum_loss.append(loss.cpu())
         # data grouping by `slash`
@@ -94,10 +99,10 @@ for t in range(500):
         # Compute and print loss. We pass Tensors containing the predicted and true
         # values of y, and the loss function returns a Tensor containing the
         # loss.
-        loss = loss_fn(y_pred, sample_batched['Y'].float())
+        loss = torch.sqrt(loss_fn(y_pred, sample_batched['Y'].float()))
         cum_test_loss.append(loss.cpu())
 
-    # print(f'Train lost: {torch.mean(torch.from_numpy(np.array(cum_loss, dtype=np.float64)))}')# Test Lost: {torch.mean(torch.from_numpy(np.array(cum_test_loss, dtype=np.float64)))}')
+    print(f'Train lost: {torch.mean(torch.from_numpy(np.array(cum_loss, dtype=np.float64)))} Test Lost: {torch.mean(torch.from_numpy(np.array(cum_test_loss, dtype=np.float64)))}')
     writer.add_scalar('data/train', torch.mean(torch.from_numpy(np.array(cum_loss, dtype=np.float64))), t)
     writer.add_scalar('data/test', torch.mean(torch.from_numpy(np.array(cum_test_loss, dtype=np.float64))), t)
 
