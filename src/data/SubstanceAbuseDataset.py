@@ -8,7 +8,7 @@ from torch.distributions.transforms import Transform
 from torch.utils.data import Dataset
 import pandas as pd
 import os
-from src.data.Analysis import ParkerAnalysis
+from src.data.Analysis import JosiahAnalysis
 from src.data.Transforms import *
 from torchvision.transforms import Compose
 import numpy as np
@@ -42,37 +42,36 @@ class SubstanceAbuseDataset(Dataset):
         self.raw_frame = pd.DataFrame.copy(self.traffic_frame)
 
         # Columns to keep
-        keep_columns = ParkerAnalysis.CATEGORICAL_VARIABLES + ParkerAnalysis.CONTINUOUS_VARIABLES + \
-                       ParkerAnalysis.DECISION_VARIABLES + ParkerAnalysis.INDEX_VARIABLES
+        keep_columns = JosiahAnalysis.CATEGORICAL_VARIABLES + JosiahAnalysis.CONTINUOUS_VARIABLES + \
+                       JosiahAnalysis.DECISION_VARIABLES + JosiahAnalysis.INDEX_VARIABLES
         keep_columns = [c for c in keep_columns if c in self.traffic_frame.columns]
-        # self.index_frame = self.traffic_frame[keep_columns + ParkerAnalysis.INDEX_VARIABLES]
+        # self.index_frame = self.traffic_frame[keep_columns + JosiahAnalysis.INDEX_VARIABLES]
         self.traffic_frame = self.traffic_frame[keep_columns]
 
         # # Remove rows that have nans in specific columns
-        # if all(c in self.traffic_frame.columns for c in ParkerAnalysis.HARD_NOT_NAN_VARIABLES):
-        #     self.traffic_frame[ParkerAnalysis.HARD_NOT_NAN_VARIABLES].dropna(inplace=True)
+        # if all(c in self.traffic_frame.columns for c in JosiahAnalysis.HARD_NOT_NAN_VARIABLES):
+        #     self.traffic_frame[JosiahAnalysis.HARD_NOT_NAN_VARIABLES].dropna(inplace=True)
 
-        # Impute the -9 Values
-        normalize_columns = [c for c in self.traffic_frame.columns if c not in ParkerAnalysis.INDEX_VARIABLES]
-        imp_mean = SimpleImputer(missing_values=-9, strategy='mean')
-        imp_mean.fit(self.traffic_frame[normalize_columns])
-        self.traffic_frame[normalize_columns] = imp_mean.transform(self.traffic_frame[normalize_columns])
+        # # Impute the -9 Values
+        # normalize_columns = [c for c in self.traffic_frame.columns if c not in JosiahAnalysis.INDEX_VARIABLES]
+        # imp_mean = SimpleImputer(missing_values=-9, strategy='mean')
+        # imp_mean.fit(self.traffic_frame[normalize_columns])
+        # self.traffic_frame[normalize_columns] = imp_mean.transform(self.traffic_frame[normalize_columns])
 
         # One Hot Categorical Columns
         accum_categoricals = []
-        for column in [_ for _ in ParkerAnalysis.CATEGORICAL_VARIABLES if _ in self.traffic_frame]:
+        for column in [_ for _ in JosiahAnalysis.CATEGORICAL_VARIABLES if _ in self.traffic_frame]:
             one_hot_slice = pd.get_dummies(self.traffic_frame[column])
             one_hot_slice.columns = [column + '_' + str(c) for c in one_hot_slice.columns]
             self.traffic_frame = self.traffic_frame.join(one_hot_slice, how='left')
             self.traffic_frame.drop(labels=column, axis=1, inplace=True)
             # Update the decision, dynamic, and fixed variables to take all this into account
-            if column not in ParkerAnalysis.DECISION_VARIABLES:
-                ParkerAnalysis.DECISION_VARIABLES += list(one_hot_slice.columns)
-            if column not in ParkerAnalysis.CATEGORICAL_VARIABLES:
+            if column not in JosiahAnalysis.DECISION_VARIABLES:
+                JosiahAnalysis.DECISION_VARIABLES += list(one_hot_slice.columns)
+            if column not in JosiahAnalysis.CATEGORICAL_VARIABLES:
                 accum_categoricals += list(one_hot_slice.columns)
-            if column not in ParkerAnalysis.CONTINUOUS_VARIABLES:
-                ParkerAnalysis.CONTINUOUS_VARIABLES += list(one_hot_slice.columns)
-        ParkerAnalysis.CATEGORICAL_VARIABLES += accum_categoricals
+            if column not in JosiahAnalysis.CONTINUOUS_VARIABLES:
+                JosiahAnalysis.CONTINUOUS_VARIABLES += list(one_hot_slice.columns)
 
         # If there are still rows that are nan, drop them
         self.traffic_frame.dropna(inplace=True)
@@ -80,7 +79,7 @@ class SubstanceAbuseDataset(Dataset):
         # Same the max value for all the columns for easy re-translation
         self.max_value_key = self.traffic_frame.max(axis=0)
 
-        normalize_columns = [c for c in self.traffic_frame.columns if c not in ParkerAnalysis.INDEX_VARIABLES]
+        normalize_columns = [c for c in self.traffic_frame.columns if c not in JosiahAnalysis.INDEX_VARIABLES]
         # Lastly, verify each row, and normalize it if needed
         self.traffic_frame[normalize_columns] = self.traffic_frame[normalize_columns] \
             .div(self.traffic_frame[normalize_columns].max(axis=0), axis=1)

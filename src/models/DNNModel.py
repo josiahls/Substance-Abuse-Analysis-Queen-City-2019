@@ -20,9 +20,9 @@ class DNNModel:
         from torch.utils.data.dataset import random_split
         # Create random Tensors to hold inputs and outputs
         print('Loading Pre Train Set')
-        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=15000)
+        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=100)
         print('Loading Test Set')
-        self.test_dataset = SubstanceAbuseDataset('HackTest.csv', './', Compose([ToXY(), ToTensor()]), n_rows=None,
+        self.test_dataset = SubstanceAbuseDataset('HackTest.csv', './', Compose([ToXY(), ToTensor()]), n_rows=100,
                                              master_columns=train_val_dataset_pre.traffic_frame.columns)
         print('Loading Train')
         self.train_val_dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]),
@@ -151,7 +151,7 @@ class DNNModel:
         writer.close()
 
     def create_predictions(self):
-        from src.data.Analysis import ParkerAnalysis
+        from src.data.Analysis import JosiahAnalysis
         import pandas as pd
         import numpy as np
         # Variables to accumulate the outputs for the prediction csv
@@ -161,7 +161,7 @@ class DNNModel:
         print('Moving to test dataset')
 
         # Run on test set:
-        maxes = self.train_val_dataset.max_value_key[ParkerAnalysis.DECISION_VARIABLES]
+        maxes = self.train_val_dataset.max_value_key[JosiahAnalysis.DECISION_VARIABLES]
         for i in range(len(self.test_dataset)):
             x = self.test_dataset[i]['X'].to(device=self.device)
             x_indexed = self.test_dataset[i]['I'].to(device=self.device)
