@@ -84,7 +84,7 @@ class DNNModel:
 
         loss_tracking = []
         learning_rate = 1e-3
-        for t in range(30):
+        for t in range(5):
             cum_loss = []
             for i_batch, sample_batched in enumerate(self.train_loader):
                 x_batch = sample_batched['X'].to(device=self.device)

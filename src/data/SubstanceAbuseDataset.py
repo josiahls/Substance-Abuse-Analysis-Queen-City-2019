@@ -57,6 +57,11 @@ class SubstanceAbuseDataset(Dataset):
         # imp_mean = SimpleImputer(missing_values=-9, strategy='mean')
         # imp_mean.fit(self.traffic_frame[normalize_columns])
         # self.traffic_frame[normalize_columns] = imp_mean.transform(self.traffic_frame[normalize_columns])
+        # self.substance_abuse_frame[JosiahAnalysis.HARD_NOT_NAN_VARIABLES].dropna()
+        if csv_file != 'HackTest.csv':
+            for c in [_ for _ in JosiahAnalysis.HARD_NOT_NAN_VARIABLES if _ in self.substance_abuse_frame.columns]:
+                self.substance_abuse_frame[c] = self.substance_abuse_frame[c].apply(lambda x: np.nan if x == -9 else x)
+            self.substance_abuse_frame[JosiahAnalysis.HARD_NOT_NAN_VARIABLES].dropna(inplace=True)
 
         # One Hot Categorical Columns
         accum_categoricals = []
@@ -66,11 +71,11 @@ class SubstanceAbuseDataset(Dataset):
             self.substance_abuse_frame = self.substance_abuse_frame.join(one_hot_slice, how='left')
             self.substance_abuse_frame.drop(labels=column, axis=1, inplace=True)
             # Update the decision, dynamic, and fixed variables to take all this into account
-            if column not in JosiahAnalysis.DECISION_VARIABLES:
+            if column in JosiahAnalysis.DECISION_VARIABLES:
                 JosiahAnalysis.DECISION_VARIABLES += list(one_hot_slice.columns)
-            if column not in JosiahAnalysis.CATEGORICAL_VARIABLES:
+            if column in JosiahAnalysis.CATEGORICAL_VARIABLES:
                 accum_categoricals += list(one_hot_slice.columns)
-            if column not in JosiahAnalysis.CONTINUOUS_VARIABLES:
+            if column in JosiahAnalysis.CONTINUOUS_VARIABLES:
                 JosiahAnalysis.CONTINUOUS_VARIABLES += list(one_hot_slice.columns)
 
         # If there are still rows that are nan, drop them
