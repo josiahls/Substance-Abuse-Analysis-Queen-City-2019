@@ -1,3 +1,4 @@
+from datetime import datetime
 from queue import Queue, LifoQueue
 
 
@@ -57,13 +58,13 @@ class DNNModel:
         # linear function, and holds internal Tensors for its weight and bias.
         H = 100
         self.model = torch.nn.Sequential(
-            torch.nn.Linear(len(self.train_dataset[0]['X']), H),
+            torch.nn.Linear(len(self.train_dataset[0]['X']), 100),
             torch.nn.LeakyReLU(),
-            torch.nn.Linear(H, H),
+            torch.nn.Linear(100, 20),
             torch.nn.LeakyReLU(),
-            torch.nn.Linear(H, H),
+            torch.nn.Linear(20, 5),
             torch.nn.LeakyReLU(),
-            torch.nn.Linear(H, len(self.train_dataset[0]['Y'])),
+            torch.nn.Linear(5, len(self.train_dataset[0]['Y'])),
         )
 
         # self.model = torch.nn.Sequential( torch.nn.Linear(10, 20), torch.nn.Linear(20, 2))
@@ -173,5 +174,6 @@ class DNNModel:
             if i % 100:
                 print(f'At test i {i}')
 
+        date = datetime.now()
         pd.DataFrame({'CASEID': indexes, 'LOS_PRED': y_los, 'REASON_PRED': y_reason}) \
-            .to_csv('../submission/predictions.csv', header=False, index=False)
+            .to_csv(f'../submission/{str(date.ctime())}predictions.csv', header=False, index=False)
