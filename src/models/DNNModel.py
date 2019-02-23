@@ -59,42 +59,42 @@ class DNNModel:
         # produce its output. Each Linear Module computes output from input using a
         # linear function, and holds internal Tensors for its weight and bias.
         H = 100
-        # self.model = torch.nn.Sequential(
-        #     torch.nn.Linear(len(self.train_dataset[0]['X']), 42),
-        #     torch.nn.LeakyReLU(),
-        #     torch.nn.Linear(42, 8),
-        #     torch.nn.LeakyReLU(),
-        #     torch.nn.Linear(8, 3),
-        #     torch.nn.LeakyReLU(),
-        #     torch.nn.Linear(3, len(self.train_dataset[0]['Y'])),
-        # )
+        self.model = torch.nn.Sequential(
+            torch.nn.Linear(len(self.train_dataset[0]['X']), 42),
+            torch.nn.LeakyReLU(),
+            torch.nn.Linear(42, 8),
+            torch.nn.LeakyReLU(),
+            torch.nn.Linear(8, 3),
+            torch.nn.LeakyReLU(),
+            torch.nn.Linear(3, len(self.train_dataset[0]['Y'])),
+        )
 
-        class DropModel(nn.Module):
-            def __init__(self, input_dim, output_dim, hidden_dim1, hidden_dim2, hidden_dim3, p):
-                super(DropModel, self).__init__()
-                self.hidden_dim1 = hidden_dim1
-                self.hidden_dim2 = hidden_dim2
-                self.hidden_dim3 = hidden_dim3
-                self.linear1 = nn.Linear(input_dim, hidden_dim1)
-                self.linear2 = nn.Linear(hidden_dim1, hidden_dim2)
-                self.linear3 = nn.Linear(hidden_dim2, hidden_dim3)
-                self.linear4 = nn.Linear(hidden_dim3, output_dim)
-
-                self.drop_layer = nn.Dropout(p=p)
-                self.leaky_relu = nn.LeakyReLU()
-
-            def forward(self, input):
-                out = self.linear1(input)
-                out = self.leaky_relu(out)
-                out = self.drop_layer(out)
-                out = self.linear2(out)
-                out = self.leaky_relu(out)
-                out = self.linear3(out)
-                out = self.leaky_relu(out)
-                out = self.linear4(out)
-                return out
-
-        self.model = DropModel(len(self.train_dataset[0]['X']), len(self.train_dataset[0]['Y']), 9, 6, 4, 0.5)
+        # class DropModel(nn.Module):
+        #     def __init__(self, input_dim, output_dim, hidden_dim1, hidden_dim2, hidden_dim3, p):
+        #         super(DropModel, self).__init__()
+        #         self.hidden_dim1 = hidden_dim1
+        #         self.hidden_dim2 = hidden_dim2
+        #         self.hidden_dim3 = hidden_dim3
+        #         self.linear1 = nn.Linear(input_dim, hidden_dim1)
+        #         self.linear2 = nn.Linear(hidden_dim1, hidden_dim2)
+        #         self.linear3 = nn.Linear(hidden_dim2, hidden_dim3)
+        #         self.linear4 = nn.Linear(hidden_dim3, output_dim)
+        #
+        #         self.drop_layer = nn.Dropout(p=p)
+        #         self.leaky_relu = nn.LeakyReLU()
+        #
+        #     def forward(self, input):
+        #         out = self.linear1(input)
+        #         out = self.leaky_relu(out)
+        #         out = self.drop_layer(out)
+        #         out = self.linear2(out)
+        #         out = self.leaky_relu(out)
+        #         out = self.linear3(out)
+        #         out = self.leaky_relu(out)
+        #         out = self.linear4(out)
+        #         return out
+        #
+        # self.model = DropModel(len(self.train_dataset[0]['X']), len(self.train_dataset[0]['Y']), 9, 6, 4, 0.5)
 
         # self.model = torch.nn.Sequential( torch.nn.Linear(10, 20), torch.nn.Linear(20, 2))
         # Try loading cuda
