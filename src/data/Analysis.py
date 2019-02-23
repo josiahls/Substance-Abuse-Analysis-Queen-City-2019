@@ -22,8 +22,6 @@ class ParkerAnalysis:
     CONTINUOUS_VARIABLES += [e for e in CONTINUOUS_AND_1HOT_VARIABLES]
     BOOLEAN_VARIABLES = ['SEX', 'PREG', 'VET', 'METHUSE', 'ALCFLG', 'COKEFLG', 'MARFLG', 'HERFLG', 'METHFLG', 'OPSYNFLG', 'PCPFLG', 'HALLFLG', 'MTHAMFLG', 'AMPHFLG', 'STIMFLG', 'BENZFLG', 'TRNQFLG', 'BARBFLG', 'SEDHPFLG', 'INHFLG', 'OTCFLG', 'OTHERFLG', 'PSYPROB'] # exactly 2 values that need to be condensed to one
     CONVERT_TO_BOOLEAN_VARIABLES = {'ETHNIC': 5}
-    CONTINUOUS_VARIABLES += BOOLEAN_VARIABLES
-    CONVERT_TO_BOOLEAN_VARIABLES = {'ETHNICITY': 5}
     CATEGORICAL_VARIABLES += [e for e in CONVERT_TO_BOOLEAN_VARIABLES]
     #CUSTOM_VARIABLES = ['DSMCRIT'] # these will be passed to a function with the name of the variable for cleaning
     # geo variable: STFIPS, CBSA
