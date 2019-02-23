@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append('../')
 
 from torch.distributions.transforms import Transform
@@ -10,13 +11,16 @@ from src.data.Transforms import *
 from torchvision.transforms import Compose
 import numpy as np
 from pathlib import Path
+
+
 # from utils import *
 
 
 class SubstanceAbuseDataset(Dataset):
     """Face Landmarks dataset."""
 
-    def __init__(self, csv_file='HackTrain.csv', root_dir='./', transform: Transform = None, n_rows=None):
+    def __init__(self, csv_file='HackTrain.csv', root_dir='./', transform: Transform = None, n_rows=None,
+                 master_columns=None, dataframe=None):
         """
         Args:
             csv_file (string): Path to the csv file with annotations.
@@ -24,13 +28,24 @@ class SubstanceAbuseDataset(Dataset):
             transform (callable, optional): Optional transform to be applied
                 on a sample.
         """
-        # We want to load the data frame, but only keep relevant columns
-        self.traffic_frame = pd.read_csv(os.path.join(str(Path(__file__).resolve().parents[1]), 'data', csv_file),
-                                         nrows=n_rows)[JosiahAnalysis.FIXED_VARIABLES + JosiahAnalysis.DYNAMIC_VARIABLES
-                                                       + JosiahAnalysis.DECISION_VARIABLES]
+
+        if dataframe is None:
+            self.traffic_frame = pd.read_csv(os.path.join(str(Path(__file__).resolve().parents[1]), 'data', csv_file),
+                                             nrows=n_rows)
+            # TODO Parker Randomize here ^^^^
+        else:
+            self.traffic_frame = dataframe
+        self.raw_frame = pd.DataFrame.copy(self.traffic_frame)
+
+        # Columns to keep
+        keep_columns = JosiahAnalysis.FIXED_VARIABLES + JosiahAnalysis.DYNAMIC_VARIABLES + \
+            JosiahAnalysis.DECISION_VARIABLES + JosiahAnalysis.INDEX_VARIABLES
+        keep_columns = [c for c in keep_columns if c in self.traffic_frame.columns]
+        # self.index_frame = self.traffic_frame[keep_columns + JosiahAnalysis.INDEX_VARIABLES]
+        self.traffic_frame = self.traffic_frame[keep_columns]
 
         # Remove rows that have nans in specific columns
-        if all(c for c in JosiahAnalysis.HARD_NOT_NAN_VARIABLES if c in self.traffic_frame.columns):
+        if all(c in self.traffic_frame.columns for c in JosiahAnalysis.HARD_NOT_NAN_VARIABLES):
             self.traffic_frame[JosiahAnalysis.HARD_NOT_NAN_VARIABLES].dropna(inplace=True)
 
         # One Hot Categorical Columns
@@ -50,8 +65,22 @@ class SubstanceAbuseDataset(Dataset):
         # If there are still rows that are nan, drop them
         self.traffic_frame.dropna(inplace=True)
 
+        # Same the max value for all the columns for easy re-translation
+        self.max_value_key = self.traffic_frame.max(axis=0)
+
         # Lastly, verify each row, and normalize it if needed
-        self.traffic_frame = self.traffic_frame.div(self.traffic_frame.max(axis=0), axis=1)
+        normalize_columns = [c for c in self.traffic_frame.columns if c not in JosiahAnalysis.INDEX_VARIABLES]
+        self.traffic_frame[normalize_columns] = self.traffic_frame[normalize_columns] \
+            .div(self.traffic_frame[normalize_columns].max(axis=0), axis=1)
+
+        if master_columns is not None:
+            # Add missing columns as zeros
+            for c in [c for c in master_columns if c not in self.traffic_frame.columns]:
+                self.traffic_frame.assign(Name=c)
+                self.traffic_frame[c] = 0
+
+        # Sort the columns so that their values match other frame loads
+        self.traffic_frame = self.traffic_frame.reindex(sorted(self.traffic_frame.columns), axis=1)
 
         self.root_dir = root_dir
         self.transform = transform

@@ -15,8 +15,8 @@
 cd $PBS_O_WORKDIR
 mkdir log
 {
-module load pytorch/0.4.0-anaconda3-cuda8
-python ./DNNModel.py
+module load cuda/8.0 cudnn/6.0-cuda8 pytorch/0.4.0-anaconda3-cuda8
+python ./Driver.py
 } > log/output_"$PBS_JOBNAME"_$PBS_JOBID 2>log/errorLog_"$PBS_JOBNAME"_$PBS_JOBID
 
 ## Running: Server
