@@ -58,10 +58,10 @@ class SubstanceAbuseDataset(Dataset):
         # imp_mean.fit(self.traffic_frame[normalize_columns])
         # self.traffic_frame[normalize_columns] = imp_mean.transform(self.traffic_frame[normalize_columns])
         # self.substance_abuse_frame[JosiahAnalysis.HARD_NOT_NAN_VARIABLES].dropna()
-        if csv_file != 'HackTest.csv':
-            for c in [_ for _ in JosiahAnalysis.HARD_NOT_NAN_VARIABLES if _ in self.substance_abuse_frame.columns]:
-                self.substance_abuse_frame[c] = self.substance_abuse_frame[c].apply(lambda x: np.nan if x == -9 else x)
-            self.substance_abuse_frame[JosiahAnalysis.HARD_NOT_NAN_VARIABLES].dropna(inplace=True)
+        # if csv_file != 'HackTest.csv':
+        #     for c in [_ for _ in JosiahAnalysis.HARD_NOT_NAN_VARIABLES if _ in self.substance_abuse_frame.columns]:
+        #         self.substance_abuse_frame[c] = self.substance_abuse_frame[c].apply(lambda x: np.nan if x == -9 else x)
+        #     self.substance_abuse_frame[JosiahAnalysis.HARD_NOT_NAN_VARIABLES].dropna(inplace=True)
 
         # One Hot Categorical Columns
         accum_categoricals = []
