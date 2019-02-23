@@ -1,3 +1,6 @@
+from queue import Queue, LifoQueue
+
+
 class DNNModel:
     def __init__(self):
         self.train_dataset = None
@@ -16,9 +19,9 @@ class DNNModel:
         from torch.utils.data.dataset import random_split
         # Create random Tensors to hold inputs and outputs
         print('Loading Pre Train Set')
-        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=10000)
+        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=500)
         print('Loading Test Set')
-        self.test_dataset = SubstanceAbuseDataset('HackTest.csv', './', Compose([ToXY(), ToTensor()]), n_rows=None,
+        self.test_dataset = SubstanceAbuseDataset('HackTest.csv', './', Compose([ToXY(), ToTensor()]), n_rows=200,
                                              master_columns=train_val_dataset_pre.traffic_frame.columns)
         print('Loading Train')
         self.train_val_dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]),
@@ -76,8 +79,9 @@ class DNNModel:
         # case we will use Mean Squared Error (MSE) as our loss function.
         loss_fn = torch.nn.MSELoss(size_average=False)
 
+        loss_tracking = []
         learning_rate = 1e-3
-        for t in range(20):
+        for t in range(300):
             cum_loss = []
             for i_batch, sample_batched in enumerate(self.train_loader):
                 x_batch = sample_batched['X'].to(device=self.device)
@@ -128,6 +132,16 @@ class DNNModel:
             print(f'Train lost: {torch.mean(torch.from_numpy(np.array(cum_loss, dtype=np.float64)))} Val Lost: {torch.mean(torch.from_numpy(np.array(cum_test_loss, dtype=np.float64)))}')
             writer.add_scalar('data/train', torch.mean(torch.from_numpy(np.array(cum_loss, dtype=np.float64))), t)
             writer.add_scalar('data/val', torch.mean(torch.from_numpy(np.array(cum_test_loss, dtype=np.float64))), t)
+            # Add loss to tracking queue
+            loss_tracking.append(np.average(np.array(cum_test_loss, dtype=np.float64)))
+            if len(loss_tracking) > 10:
+                gradient = np.average(np.gradient(loss_tracking, axis=0))
+                loss_tracking.pop(0)
+                if gradient > 0:
+                    print('Hit Test Loss grad limit')
+                    break
+
+
 
         # export scalar data to JSON for external processing
         writer.export_scalars_to_json("./all_scalars.json")
