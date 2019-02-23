@@ -16,7 +16,7 @@ class DNNModel:
         print(f'Using torch version {torch.__version__}')
 
         # Create random Tensors to hold inputs and outputs
-        dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=100)
+        dataset = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=None)
         test_set_size = .2
         train_dataset, validation_dataset = random_split(dataset, lengths=[int(len(dataset) * test_set_size),
                                                                            int(len(dataset) - int(len(dataset)
