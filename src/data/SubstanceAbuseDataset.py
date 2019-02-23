@@ -20,7 +20,7 @@ class SubstanceAbuseDataset(Dataset):
     """Face Landmarks dataset."""
 
     def __init__(self, csv_file='HackTrain.csv', root_dir='./', transform: Transform = None, n_rows=None,
-                 master_columns=None):
+                 master_columns=None, dataframe=None):
         """
         Args:
             csv_file (string): Path to the csv file with annotations.
@@ -28,13 +28,17 @@ class SubstanceAbuseDataset(Dataset):
             transform (callable, optional): Optional transform to be applied
                 on a sample.
         """
-        # We want to load the data frame, but only keep relevant columns
-        self.traffic_frame = pd.read_csv(os.path.join(str(Path(__file__).resolve().parents[1]), 'data', csv_file),
-                                         nrows=n_rows)
+
+        if dataframe is None:
+            self.traffic_frame = pd.read_csv(os.path.join(str(Path(__file__).resolve().parents[1]), 'data', csv_file),
+                                             nrows=n_rows)
+        else:
+            self.traffic_frame = dataframe
+        self.raw_frame = pd.DataFrame.copy(self.traffic_frame)
 
         # Columns to keep
         keep_columns = JosiahAnalysis.FIXED_VARIABLES + JosiahAnalysis.DYNAMIC_VARIABLES + \
-                       JosiahAnalysis.DECISION_VARIABLES + JosiahAnalysis.INDEX_VARIABLES
+            JosiahAnalysis.DECISION_VARIABLES + JosiahAnalysis.INDEX_VARIABLES
         keep_columns = [c for c in keep_columns if c in self.traffic_frame.columns]
         # self.index_frame = self.traffic_frame[keep_columns + JosiahAnalysis.INDEX_VARIABLES]
         self.traffic_frame = self.traffic_frame[keep_columns]
@@ -65,7 +69,7 @@ class SubstanceAbuseDataset(Dataset):
 
         # Lastly, verify each row, and normalize it if needed
         normalize_columns = [c for c in self.traffic_frame.columns if c not in JosiahAnalysis.INDEX_VARIABLES]
-        self.traffic_frame[normalize_columns] = self.traffic_frame[normalize_columns]\
+        self.traffic_frame[normalize_columns] = self.traffic_frame[normalize_columns] \
             .div(self.traffic_frame[normalize_columns].max(axis=0), axis=1)
 
         if master_columns is not None:
