@@ -40,7 +40,7 @@ class DNNModel:
     def train(self):
         import sys
         sys.path.append('../')
-        # from tensorboardX import SummaryWriter
+        from tensorboardX import SummaryWriter
         import torch
         import numpy as np
 
@@ -70,7 +70,7 @@ class DNNModel:
         self.model.to(device=self.device)
 
         # Setup the writer
-        # writer = SummaryWriter()
+        writer = SummaryWriter()
 
         # The nn package also contains definitions of popular loss functions; in this
         # case we will use Mean Squared Error (MSE) as our loss function.
@@ -126,12 +126,12 @@ class DNNModel:
                 cum_test_loss.append(loss.cpu())
 
             print(f'Train lost: {torch.mean(torch.from_numpy(np.array(cum_loss, dtype=np.float64)))} Val Lost: {torch.mean(torch.from_numpy(np.array(cum_test_loss, dtype=np.float64)))}')
-        #     writer.add_scalar('data/train', torch.mean(torch.from_numpy(np.array(cum_loss, dtype=np.float64))), t)
-        #     writer.add_scalar('data/val', torch.mean(torch.from_numpy(np.array(cum_test_loss, dtype=np.float64))), t)
-        #
-        # # export scalar data to JSON for external processing
-        # writer.export_scalars_to_json("./all_scalars.json")
-        # writer.close()
+            writer.add_scalar('data/train', torch.mean(torch.from_numpy(np.array(cum_loss, dtype=np.float64))), t)
+            writer.add_scalar('data/val', torch.mean(torch.from_numpy(np.array(cum_test_loss, dtype=np.float64))), t)
+
+        # export scalar data to JSON for external processing
+        writer.export_scalars_to_json("./all_scalars.json")
+        writer.close()
 
     def create_predictions(self):
         from src.data.Analysis import JosiahAnalysis
