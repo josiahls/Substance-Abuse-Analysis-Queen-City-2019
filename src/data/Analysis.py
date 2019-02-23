@@ -17,17 +17,27 @@ columns_and_values = np.hstack((np.array(columns).reshape((-1, 1)), np.array([da
 
 print(columns_and_values)
 
-IGNORED_VARIABLES = ['YEAR']
-FIXED_VARIABLES = []
-DYNAMIC_VARIABLES = []
-DECISION_VARIABLES = []
+class ParkerAnalysis:
+    IGNORED_VARIABLES = ['YEAR', 'CASEID']
+    FIXED_VARIABLES = []
+    DYNAMIC_VARIABLES = []
+    DECISION_VARIABLES = []
+    """ Cleaning VARIABLES """
+    CATEGORICAL_VARIABLES = []
+    BOOLEAN_VARIABLES = []
+    HARD_NOT_NAN_VARIABLES = [] + DECISION_VARIABLES
+    MILT_TIME_VARIABLES = []
 
-
-""" Cleaning VARIABLES """
-CATEGORICAL_VARIABLES = []
-BOOLEAN_VARIABLES = []
-HARD_NOT_NAN_VARIABLES = [] + DECISION_VARIABLES
-MILT_TIME_VARIABLES = []
+class JosiahAnalysis:
+    IGNORED_VARIABLES = ['YEAR', 'CASEID']
+    FIXED_VARIABLES = []
+    DYNAMIC_VARIABLES = []
+    DECISION_VARIABLES = []
+    """ Cleaning VARIABLES """
+    CATEGORICAL_VARIABLES = []
+    BOOLEAN_VARIABLES = []
+    HARD_NOT_NAN_VARIABLES = [] + DECISION_VARIABLES
+    MILT_TIME_VARIABLES = []
 
 
 
