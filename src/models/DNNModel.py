@@ -58,13 +58,13 @@ class DNNModel:
         # linear function, and holds internal Tensors for its weight and bias.
         H = 100
         self.model = torch.nn.Sequential(
-            torch.nn.Linear(len(self.train_dataset[0]['X']), 100),
+            torch.nn.Linear(len(self.train_dataset[0]['X']), 9),
             torch.nn.LeakyReLU(),
-            torch.nn.Linear(100, 50),
+            torch.nn.Linear(9, 6),
             torch.nn.LeakyReLU(),
-            torch.nn.Linear(50, 25),
+            torch.nn.Linear(6, 4),
             torch.nn.LeakyReLU(),
-            torch.nn.Linear(25, len(self.train_dataset[0]['Y'])),
+            torch.nn.Linear(4, len(self.train_dataset[0]['Y'])),
         )
 
         # self.model = torch.nn.Sequential( torch.nn.Linear(10, 20), torch.nn.Linear(20, 2))
