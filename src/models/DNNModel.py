@@ -151,16 +151,18 @@ class DNNModel:
             cum_test_loss = []
             self.model.eval()
             for i_batch, sample_batched in enumerate(self.validation_loader):
+                x_batch = sample_batched['X'].to(device=self.device)
+                y_batch = sample_batched['Y'].to(device=self.device)
                 # Forward pass: compute predicted y by passing x to the self.model. Module objects
                 # override the __call__ operator so you can call them like functions. When
                 # doing so you pass a Tensor of input data to the Module and it produces
                 # a Tensor of output data.
-                y_pred = self.model(sample_batched['X'].float())
+                y_pred = self.model(x_batch)
 
                 # Compute and print loss. We pass Tensors containing the predicted and true
                 # values of y, and the loss function returns a Tensor containing the
                 # loss.
-                loss = torch.sqrt(loss_fn(y_pred, sample_batched['Y'].float()))
+                loss = torch.sqrt(loss_fn(y_pred, y_batch))
                 cum_test_loss.append(loss.cpu())
 
             print(f'Train lost: {torch.mean(torch.from_numpy(np.array(cum_loss, dtype=np.float64)))} Val Lost: {torch.mean(torch.from_numpy(np.array(cum_test_loss, dtype=np.float64)))}')
