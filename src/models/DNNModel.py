@@ -201,7 +201,7 @@ class DNNModel:
             x_indexed = self.test_dataset[i]['I'].to(device=self.device)
             # Add missing columns as zeros
             y_pred = self.model(x)
-            decoded_y_pred = np.multiply(y_pred.detach().numpy(), np.array(maxes))
+            decoded_y_pred = np.multiply(y_pred.cpu().detach().numpy(), np.array(maxes))
             indexes.append(int(x_indexed.detach().numpy()[0]))
             y_reason.append(int(round(decoded_y_pred[0])))
             y_los.append(int(round(decoded_y_pred[1])))
