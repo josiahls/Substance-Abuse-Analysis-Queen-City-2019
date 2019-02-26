@@ -22,7 +22,7 @@ class DNNModel:
         from torch.utils.data.dataset import random_split
         # Create random Tensors to hold inputs and outputs
         print('Loading Pre Train Set')
-        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=8000)
+        train_val_dataset_pre = SubstanceAbuseDataset('HackTrain.csv', './', Compose([ToXY(), ToTensor()]), n_rows=100)
         print('Loading Test Set')
         self.test_dataset = SubstanceAbuseDataset('HackTest.csv', './', Compose([ToXY(), ToTensor()]), n_rows=None,
                                                   master_columns=train_val_dataset_pre.substance_abuse_frame.columns)
@@ -60,13 +60,11 @@ class DNNModel:
         # linear function, and holds internal Tensors for its weight and bias.
         H = 100
         self.model = torch.nn.Sequential(
-            torch.nn.Linear(len(self.train_dataset[0]['X']), 42),
+            torch.nn.Linear(len(self.train_dataset[0]['X']), 41),
             torch.nn.LeakyReLU(),
-            torch.nn.Linear(42, 8),
+            torch.nn.Linear(41, 7),
             torch.nn.LeakyReLU(),
-            torch.nn.Linear(8, 3),
-            torch.nn.LeakyReLU(),
-            torch.nn.Linear(3, len(self.train_dataset[0]['Y'])),
+            torch.nn.Linear(7, len(self.train_dataset[0]['Y'])),
         )
 
         # class DropModel(nn.Module):
@@ -113,7 +111,8 @@ class DNNModel:
 
         loss_tracking = []
         learning_rate = 1e-3
-        for t in range(20):
+        for t in range(4):
+            learning_rate *= 0.8
             cum_loss = []
 
             self.model.train()

@@ -6,7 +6,7 @@
 #PBS -N "classifier_jlaivins"
 #PBS -q copperhead
 #PBS -l walltime=2:00:00
-#PBS -l nodes=1:ppn=1:gpus=1,mem=16GB
+#PBS -l nodes=1:ppn=1:gpus=1:gtx1080ti,mem=16GB
 #PBS -V
 #
 # ===== END PBS OPTIONS =====
@@ -15,7 +15,9 @@
 cd $PBS_O_WORKDIR
 mkdir log
 {
-module load cuda/8.0 cudnn/6.0-cuda8 pytorch/0.4.0-anaconda3-cuda8
+#module load cuda/8.0 cudnn/6.0-cuda8 pytorch/0.4.0-anaconda3-cuda8
+module load cuda/8.0 cudnn/6.0-cuda8 pytorch/0.4.0-anaconda3-cuda9.2-sm6.1
+
 python ./Driver.py
 } > log/output_"$PBS_JOBNAME"_$PBS_JOBID 2>log/errorLog_"$PBS_JOBNAME"_$PBS_JOBID
 
