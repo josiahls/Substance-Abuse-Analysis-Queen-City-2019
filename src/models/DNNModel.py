@@ -111,7 +111,7 @@ class DNNModel:
 
         loss_tracking = []
         learning_rate = 1e-3
-        for t in range(4):
+        for t in range(40):
             learning_rate *= 0.8
             cum_loss = []
 
